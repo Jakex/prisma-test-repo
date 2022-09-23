@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  guildId String   @unique
+  modules Modules
+  users   Member[]
+}
+
+model Member {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  rblxId   Int      @default(0)
+  xp       Int      @default(0)
+  userId   Int      @default(0)
+  medalIDs String[] @db.ObjectId
+  medals   Medal[]  @relation(fields: [medalIDs], references: [id])
+  guildId  String   @db.ObjectId
+  Guild    Guild    @relation(fields: [guildId], references: [id])
+}
+
+
+model Medal {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @default("New Medal")
+  medalID     Int      @default(0)
+  description String   @default("I am a newly created medal, hosted on NEO!")
+  userIDs     String[] @db.ObjectId
+  users       Member[] @relation(fields: [userIDs], references: [id])
+}
+
+type Modules {
+  moderation Boolean @default(true)
+  clanning   Boolean @default(false)
+  logging    Boolean @default(false)
+}
+
